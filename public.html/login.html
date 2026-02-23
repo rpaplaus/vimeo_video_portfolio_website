@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alma 11:11 — Partner Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Barlow+Condensed:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  :root{--gold:#C9A84C;--white:#F0EDE8;--gray:#888880;--darker:#050505;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--darker);color:var(--white);font-family:'Barlow Condensed',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+  .bg-num{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Cormorant Garamond',serif;font-size:40vw;font-weight:300;color:rgba(201,168,76,.025);letter-spacing:.1em;white-space:nowrap;pointer-events:none;user-select:none;}
+  .login-box{width:100%;max-width:400px;padding:24px;position:relative;z-index:1;animation:fadeUp .8s ease both;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(32px);}to{opacity:1;transform:translateY(0);}}
+  .back{display:inline-flex;align-items:center;gap:8px;color:var(--gray);text-decoration:none;font-size:10px;letter-spacing:.3em;text-transform:uppercase;margin-bottom:64px;transition:color .3s;}
+  .back:hover{color:var(--gold);}
+  .logo{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;letter-spacing:.3em;line-height:1;}
+  .logo span{color:var(--gold);}
+  .sub{font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--gray);margin-bottom:56px;margin-top:4px;}
+  .heading{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;letter-spacing:.1em;margin-bottom:36px;color:rgba(240,237,232,.7);}
+  .form-group{margin-bottom:22px;}
+  label{display:block;font-size:9px;letter-spacing:.4em;text-transform:uppercase;color:var(--gray);margin-bottom:8px;}
+  input{width:100%;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:var(--white);font-family:'Barlow Condensed',sans-serif;font-size:15px;letter-spacing:.05em;padding:13px 15px;outline:none;transition:border-color .3s;}
+  input:focus{border-color:rgba(201,168,76,.5);}
+  input::placeholder{color:rgba(136,136,128,.4);}
+  .btn{width:100%;padding:15px;background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.4em;text-transform:uppercase;cursor:pointer;margin-top:10px;transition:all .35s;position:relative;overflow:hidden;}
+  .btn::before{content:'';position:absolute;inset:0;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .4s ease;}
+  .btn:hover::before{transform:scaleX(1);}
+  .btn-label{position:relative;z-index:1;transition:color .35s;}
+  .btn:hover .btn-label{color:var(--darker);}
+  .btn:disabled{opacity:.5;cursor:not-allowed;}
+  .error{font-size:12px;letter-spacing:.05em;color:#e74c3c;margin-top:14px;display:none;text-align:center;}
+  .error.show{display:block;}
+  .hint{font-family:'Cormorant Garamond',serif;font-size:13px;color:rgba(136,136,128,.35);text-align:center;margin-top:32px;font-style:italic;}
+</style>
+</head>
+<body>
+
+<div class="bg-num">11:11</div>
+
+<div class="login-box">
+  <a class="back" href="index.html">← Back to site</a>
+  <div class="logo">ALMA <span>11:11</span></div>
+  <div class="sub">Partner Area</div>
+  <p class="heading">Welcome back</p>
+
+  <div class="form-group">
+    <label for="email">E-mail</label>
+    <input type="email" id="email" placeholder="your@email.com" autocomplete="email">
+  </div>
+  <div class="form-group">
+    <label for="password">Password</label>
+    <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+  </div>
+  <button class="btn" id="btnLogin" onclick="doLogin()"><span class="btn-label">Enter</span></button>
+  <div class="error" id="errorMsg">Invalid e-mail or password.</div>
+  <p class="hint">Listen to Your Soul 11:11</p>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  // ▼▼▼ COLE SEU firebaseConfig AQUI ▼▼▼
+  const firebaseConfig = {
+    apiKey: "Asvbnsviusjnvm'imjvniusIU[nouanpaiuvn[os",
+    authDomain: "myfirebase.firebaseapp.com",
+    projectId: "myfirebase",
+    storageBucket: "myfirebase.firebasestorage.app",
+    messagingSenderId: "xxxxxxxxxxxxx",
+    appId: "Xxxxxxxxxxxxxxxxxxxxx",
+    measurementId: "G-KEMDCYBHZD"
+  };
+  // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  document.getElementById('password').addEventListener('keydown', e => { if(e.key==='Enter') window.doLogin(); });
+
+  window.doLogin = async function() {
+    const email = document.getElementById('email').value.trim();
+    const pass = document.getElementById('password').value;
+    const btn = document.getElementById('btnLogin');
+    const err = document.getElementById('errorMsg');
+    err.classList.remove('show');
+    btn.disabled = true;
+    btn.querySelector('.btn-label').textContent = '...';
+
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
+      window.location.href = 'admin.html';
+    } catch(e) {
+      err.classList.add('show');
+      btn.disabled = false;
+      btn.querySelector('.btn-label').textContent = 'Enter';
+      document.getElementById('password').value = '';
+    }
+  };
+</script>
+</body>
+</html>

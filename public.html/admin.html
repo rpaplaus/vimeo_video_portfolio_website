@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alma 11:11 — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400&family=Barlow+Condensed:wght@200;300;400;600&family=Barlow:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root{--gold:#C9A84C;--gold-light:#E8C96A;--white:#F0EDE8;--gray:#888880;--dark:#0A0A0A;--darker:#050505;--green:#4CAF73;--red:#C0392B;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--darker);color:var(--white);font-family:'Barlow',sans-serif;font-weight:300;min-height:100vh;}
+  .topbar{background:rgba(10,10,10,.98);border-bottom:1px solid rgba(201,168,76,.15);padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+  .topbar-logo{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;letter-spacing:.25em;}
+  .topbar-logo span{color:var(--gold);}
+  .badge{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(201,168,76,.3);padding:3px 10px;margin-left:12px;}
+  .user-email{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.1em;color:var(--gray);}
+  .topbar-right{display:flex;gap:16px;align-items:center;}
+  .btn-sm{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--gray);background:none;border:1px solid rgba(255,255,255,.1);padding:8px 16px;cursor:pointer;transition:all .3s;text-decoration:none;display:inline-block;}
+  .btn-sm:hover{color:var(--white);border-color:rgba(255,255,255,.3);}
+  .layout{display:grid;grid-template-columns:340px 1fr;min-height:calc(100vh - 64px);}
+  .sidebar{background:var(--dark);border-right:1px solid rgba(201,168,76,.08);padding:40px 32px;position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto;}
+  .sidebar h2{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--gold);margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid rgba(201,168,76,.12);}
+  .form-group{margin-bottom:20px;}
+  .form-label{display:block;font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.35em;text-transform:uppercase;color:var(--gray);margin-bottom:8px;}
+  .form-input,.form-select{width:100%;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:var(--white);font-family:'Barlow',sans-serif;font-size:14px;padding:11px 14px;outline:none;transition:border-color .3s;appearance:none;}
+  .form-input:focus,.form-select:focus{border-color:rgba(201,168,76,.4);}
+  .form-input::placeholder{color:rgba(136,136,128,.4);}
+  .form-select option{background:#1a1a1a;}
+  .form-hint{font-size:11px;color:rgba(136,136,128,.5);margin-top:6px;font-family:'Barlow Condensed',sans-serif;letter-spacing:.05em;}
+  .preview-box{width:100%;aspect-ratio:16/9;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);margin:20px 0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.2em;color:rgba(136,136,128,.4);text-transform:uppercase;position:relative;}
+  .preview-box iframe{position:absolute;inset:0;width:100%;height:100%;border:none;pointer-events:none;}
+  .btn-add{width:100%;padding:14px;background:var(--gold);border:none;color:var(--darker);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.4em;text-transform:uppercase;font-weight:600;cursor:pointer;transition:background .3s;margin-top:8px;}
+  .btn-add:hover{background:var(--gold-light);}
+  .btn-add:disabled{opacity:.5;cursor:not-allowed;}
+  .main{padding:40px;}
+  .main-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:32px;}
+  .main-title span{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);display:block;margin-bottom:4px;}
+  .main-title h1{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;letter-spacing:.05em;}
+  .count-num{font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:300;color:var(--gold);line-height:1;}
+  .search-input{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:var(--white);font-family:'Barlow',sans-serif;font-size:13px;padding:9px 14px;outline:none;transition:border-color .3s;width:300px;margin-bottom:24px;}
+  .search-input:focus{border-color:rgba(201,168,76,.3);}
+  .search-input::placeholder{color:rgba(136,136,128,.4);}
+  table{width:100%;border-collapse:collapse;}
+  th{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.4em;text-transform:uppercase;color:var(--gray);text-align:left;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.06);}
+  td{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.04);font-size:14px;vertical-align:middle;}
+  tr:hover td{background:rgba(255,255,255,.02);}
+  .thumb-wrap{width:100px;height:56px;background:#111;position:relative;overflow:hidden;}
+  .thumb-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
+  .thumb-wrap .no-thumb{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:9px;color:var(--gray);}
+  .cat-tag{display:inline-block;font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(201,168,76,.3);padding:3px 8px;}
+  .feat-tag{display:inline-block;font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.2em;text-transform:uppercase;padding:3px 8px;}
+  .feat-tag.yes{color:var(--green);border:1px solid rgba(76,175,115,.3);}
+  .feat-tag.no{color:rgba(136,136,128,.4);border:1px solid rgba(136,136,128,.15);}
+  .icon-btn{background:none;border:none;cursor:pointer;padding:6px;opacity:.5;transition:opacity .2s;color:var(--gray);}
+  .icon-btn:hover{opacity:1;}
+  .icon-btn.del{color:var(--red);}
+  .icon-btn.edit{color:var(--gold);}
+  .icon-btn:disabled{opacity:.15;cursor:not-allowed;}
+
+  /* Award tags */
+  .award-tag{display:inline-flex;align-items:center;gap:6px;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.15em;color:var(--gold);border:1px solid rgba(201,168,76,.3);padding:3px 8px;background:rgba(201,168,76,.05);}
+  .award-tag button{background:none;border:none;color:var(--gold);cursor:pointer;font-size:13px;line-height:1;opacity:.6;padding:0;transition:opacity .2s;}
+  .award-tag button:hover{opacity:1;}
+  .awards-display{display:flex;flex-wrap:wrap;gap:4px;}
+
+  /* Edit Modal */
+  .modal-bg{position:fixed;inset:0;background:rgba(5,5,5,.85);z-index:300;display:none;align-items:center;justify-content:center;}
+  .modal-bg.open{display:flex;}
+  .modal{background:#111;border:1px solid rgba(201,168,76,.15);padding:40px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;position:relative;}
+  .modal h3{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--gold);margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid rgba(201,168,76,.12);}
+  .modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--gray);cursor:pointer;font-size:18px;transition:color .2s;}
+  .modal-close:hover{color:var(--white);}
+  .btn-save{width:100%;padding:13px;background:var(--gold);border:none;color:var(--darker);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.4em;text-transform:uppercase;font-weight:600;cursor:pointer;transition:background .3s;margin-top:8px;}
+  .btn-save:hover{background:var(--gold-light);}
+  .btn-save:disabled{opacity:.5;cursor:not-allowed;}
+  .vimeo-link{color:var(--gray);text-decoration:none;font-family:'Barlow Condensed',sans-serif;font-size:13px;transition:color .2s;}
+  .vimeo-link:hover{color:var(--gold);}
+  .empty{text-align:center;padding:80px;color:var(--gray);}
+  .empty p{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;margin-bottom:8px;}
+  .empty small{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.5;}
+  .toast{position:fixed;bottom:32px;right:32px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;padding:14px 24px;transform:translateY(80px);opacity:0;transition:all .4s;z-index:999;}
+  .toast.show{transform:translateY(0);opacity:1;}
+  .saving-overlay{position:fixed;inset:0;background:rgba(5,5,5,.6);z-index:500;display:none;align-items:center;justify-content:center;}
+  .saving-overlay.show{display:flex;}
+  .saving-overlay p{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.4em;text-transform:uppercase;color:var(--gold);}
+  @media(max-width:768px){.layout{grid-template-columns:1fr;}.sidebar{position:relative;top:0;height:auto;}.main{padding:24px;}.topbar{padding:0 20px;}}
+</style>
+</head>
+<datalist id="categorySuggestions"></datalist>
+<body>
+
+<div class="topbar">
+  <div>
+    <span class="topbar-logo">ALMA <span>11:11</span></span>
+    <span class="badge">Admin</span>
+  </div>
+  <div class="topbar-right">
+    <span class="user-email" id="userEmail"></span>
+    <a href="index.html" class="btn-sm" target="_blank">View Site</a>
+    <button class="btn-sm" onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <h2>Add New Work</h2>
+
+    <div class="form-group">
+      <label class="form-label">Vimeo ID *</label>
+      <input class="form-input" type="text" id="addVimeoId" placeholder="ex: 924919066" oninput="livePreview()">
+      <p class="form-hint">vimeo.com/<strong>924919066</strong> ← esse número</p>
+    </div>
+
+    <div class="preview-box" id="previewBox">Video Preview</div>
+
+    <div class="form-group">
+      <label class="form-label">Title *</label>
+      <input class="form-input" type="text" id="addTitle" placeholder="Client — Campaign Name">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Category *</label>
+      <input class="form-input" type="text" id="addCategory"
+       placeholder="Advertising, Film, Sports..."
+       list="categorySuggestions">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Carousel (Hero)?</label>
+      <select class="form-select" id="addFeatured">
+        <option value="1">Sim — Aparece no carrossel</option>
+        <option value="0">Não — Grid only</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Prêmios</label>
+      <div id="addAwardsList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px;"></div>
+      <div style="display:flex;gap:8px;">
+        <input class="form-input" type="text" id="addAwardInput" placeholder="ex: Cannes Lions" style="flex:1;" onkeydown="if(event.key==='Enter'){event.preventDefault();addAwardTag();}">
+        <button type="button" onclick="addAwardTag()" style="background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.2em;padding:0 16px;cursor:pointer;white-space:nowrap;transition:background .2s;" onmouseover="this.style.background='rgba(201,168,76,.3)'" onmouseout="this.style.background='rgba(201,168,76,.15)'">+ Add</button>
+      </div>
+      <p class="form-hint">Digite o nome do prêmio e clique em Add ou pressione Enter</p>
+    </div>
+
+    <button class="btn-add" id="btnAdd" onclick="addWork()">Adicionar Work</button>
+  </aside>
+
+  <main class="main">
+    <div class="main-header">
+      <div class="main-title">
+        <span>Portfolio</span>
+        <h1>All Works</h1>
+      </div>
+      <div class="count-num" id="countNum">—</div>
+    </div>
+
+    <input class="search-input" type="text" placeholder="Buscar por título ou categoria..." oninput="filterTable(this.value)">
+
+    <table>
+      <thead>
+        <tr>
+          <th>Thumb</th>
+          <th>Title</th>
+          <th>Vimeo ID</th>
+          <th>Category</th>
+          <th>Awards</th>
+          <th>Carousel</th>
+          <th>Order</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="worksBody"></tbody>
+    </table>
+    <div id="emptyState" class="empty" style="display:none">
+      <p>Nenhum work ainda</p>
+      <small>Use o formulário ao lado para adicionar</small>
+    </div>
+  </main>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-bg" id="editModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeEdit()">✕</button>
+    <h3>Edit Work</h3>
+    <input type="hidden" id="editId">
+
+    <div class="form-group">
+      <label class="form-label">Title *</label>
+      <input class="form-input" type="text" id="editTitle">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Category *</label>
+      <input class="form-input" type="text" id="editCategory"
+       list="categorySuggestions">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Carousel (Hero)?</label>
+      <select class="form-select" id="editFeatured">
+        <option value="1">Sim — Aparece no carrossel</option>
+        <option value="0">Não — Grid only</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Prêmios</label>
+      <div id="editAwardsList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px;"></div>
+      <div style="display:flex;gap:8px;">
+        <input class="form-input" type="text" id="editAwardInput" placeholder="ex: Cannes Lions" style="flex:1;" onkeydown="if(event.key==='Enter'){event.preventDefault();editAddAwardTag();}">
+        <button type="button" onclick="editAddAwardTag()" style="background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.2em;padding:0 16px;cursor:pointer;white-space:nowrap;transition:background .2s;" onmouseover="this.style.background='rgba(201,168,76,.3)'" onmouseout="this.style.background='rgba(201,168,76,.15)'">+ Add</button>
+      </div>
+      <p class="form-hint">Digite o nome do prêmio e clique em Add ou Enter</p>
+    </div>
+
+    <button class="btn-save" id="btnSaveEdit" onclick="saveEdit()">Save Changes</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="saving-overlay" id="savingOverlay"><p>Saving...</p></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import {
+    getFirestore, collection, getDocs, addDoc, deleteDoc, doc,
+    query, orderBy, updateDoc, writeBatch
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // ▼▼▼ COLE SEU firebaseConfig AQUI ▼▼▼
+  const firebaseConfig = {
+    apiKey: "Asvbnsviusjnvm'imjvniusIU[nouanpaiuvn[os",
+    authDomain: "myfirebase.firebaseapp.com",
+    projectId: "myfirebase",
+    storageBucket: "myfirebase.firebasestorage.app",
+    messagingSenderId: "xxxxxxxxxxxxx",
+    appId: "Xxxxxxxxxxxxxxxxxxxxx",
+    measurementId: "G-KEMDCYBHZD"
+  };
+  // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  let works = [];
+
+  // ── Auth guard ─────────────────────────────────
+  onAuthStateChanged(auth, user => {
+    if (!user) { window.location.href = 'login.html'; return; }
+    document.getElementById('userEmail').textContent = user.email;
+    loadWorks();
+  });
+
+  window.logout = async () => {
+    await signOut(auth);
+    window.location.href = 'login.html';
+  };
+
+  // ── Load ───────────────────────────────────────
+  async function loadWorks() {
+    try {
+      const snap = await getDocs(query(collection(db,'works'), orderBy('order','asc')));
+      works = snap.docs.map(d => ({id: d.id, ...d.data()}));
+    } catch(e) {
+      toast('Erro ao carregar: '+e.message, 'error');
+    }
+    renderTable();
+    updateCount();
+    updateCategorySuggestions(); // ← só essa linha é nova aqui
+  }
+
+  // ── Render ─────────────────────────────────────
+  function renderTable(filter='') {
+    const body = document.getElementById('worksBody');
+    const empty = document.getElementById('emptyState');
+    let list = works;
+    if(filter) {
+      const q = filter.toLowerCase();
+      list = works.filter(w => w.title.toLowerCase().includes(q) || (w.category||'').toLowerCase().includes(q));
+    }
+
+    if(!list.length) { body.innerHTML=''; empty.style.display='block'; return; }
+    empty.style.display = 'none';
+
+    body.innerHTML = list.map((w,i) => `
+      <tr>
+        <td>
+          <div class="thumb-wrap">
+            <img src="https://vumbnail.com/${w.vimeoId}.jpg" onerror="this.style.display='none'">
+            <div class="no-thumb">NO IMG</div>
+          </div>
+        </td>
+        <td style="max-width:180px;font-weight:400">${w.title}</td>
+        <td><a class="vimeo-link" href="https://vimeo.com/${w.vimeoId}" target="_blank">${w.vimeoId} ↗</a></td>
+        <td><span class="cat-tag">${w.category||'—'}</span></td>
+        <td>
+          <div class="awards-display">
+            ${(w.awards||[]).map(a=>`<span class="award-tag">★ ${a}</span>`).join('')}
+            ${!(w.awards||[]).length ? '<span style="color:rgba(136,136,128,.3);font-family:Barlow Condensed,sans-serif;font-size:10px;">—</span>' : ''}
+          </div>
+        </td>
+        <td><span class="feat-tag ${w.featured?'yes':'no'}">${w.featured?'Sim':'Não'}</span></td>
+        <td>
+          <button class="icon-btn" title="Subir" onclick="moveUp('${w.id}')" ${i===0?'disabled':''}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>
+          </button>
+          <button class="icon-btn" title="Descer" onclick="moveDown('${w.id}')" ${i===list.length-1?'disabled':''}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+        </td>
+        <td style="white-space:nowrap;">
+          <button class="icon-btn edit" title="Editar" onclick="openEdit('${w.id}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="icon-btn del" title="Remover" onclick="removeWork('${w.id}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+          </button>
+        </td>
+      </tr>`).join('');
+  }
+
+  function updateCount() {
+    document.getElementById('countNum').textContent = works.length;
+  }
+    function updateCategorySuggestions() {
+    const cats = [...new Set(works.map(w => w.category).filter(Boolean))].sort();
+    document.getElementById('categorySuggestions').innerHTML =
+      cats.map(c => `<option value="${c}">`).join('');
+  }
+
+  window.filterTable = val => renderTable(val);
+
+  // ── Awards tags (Add form) ─────────────────────
+  let addAwards = [];
+
+  window.addAwardTag = function() {
+    const input = document.getElementById('addAwardInput');
+    const val = input.value.trim();
+    if(!val) return;
+    addAwards.push(val);
+    input.value = '';
+    renderAddAwards();
+  };
+
+  function renderAddAwards() {
+    const list = document.getElementById('addAwardsList');
+    list.innerHTML = addAwards.map((a,i) => `
+      <div class="award-tag" style="justify-content:space-between;">
+        <span>★ ${a}</span>
+        <button onclick="removeAddAward(${i})" title="Remover">✕</button>
+      </div>`).join('');
+  }
+
+  window.removeAddAward = function(i) {
+    addAwards.splice(i,1);
+    renderAddAwards();
+  };
+
+  // ── Add ────────────────────────────────────────
+  window.addWork = async function() {
+    const vimeoId = document.getElementById('addVimeoId').value.trim();
+    const title = document.getElementById('addTitle').value.trim();
+    const category = document.getElementById('addCategory').value.trim();
+    const featured = document.getElementById('addFeatured').value === '1';
+
+    if(!vimeoId || !title || !category) { toast('Preencha todos os campos *','error'); return; }
+
+    const btn = document.getElementById('btnAdd');
+    btn.disabled = true;
+    showSaving(true);
+
+    try {
+      const docRef = await addDoc(collection(db,'works'), { vimeoId, title, category, featured, awards: addAwards, order: 0 });
+      const batch = writeBatch(db);
+      works.forEach(w => batch.update(doc(db,'works',w.id), {order: (w.order||0)+1}));
+      batch.update(doc(db,'works',docRef.id), {order: 0});
+      await batch.commit();
+
+      document.getElementById('addVimeoId').value='';
+      document.getElementById('addTitle').value='';
+      document.getElementById('addCategory').value='';
+      document.getElementById('addFeatured').value='1';
+      document.getElementById('previewBox').innerHTML='Video Preview';
+      addAwards = [];
+      renderAddAwards();
+      toast('Work adicionado!');
+      await loadWorks();
+    } catch(e) {
+      toast('Erro: '+e.message,'error');
+    } finally {
+      btn.disabled = false;
+      showSaving(false);
+    }
+  };
+
+  // ── Edit Modal ─────────────────────────────────
+  let editAwards = [];
+
+  window.openEdit = function(id) {
+    const w = works.find(w=>w.id===id);
+    if(!w) return;
+    document.getElementById('editId').value = id;
+    document.getElementById('editTitle').value = w.title||'';
+    document.getElementById('editCategory').value = w.category||'';
+    document.getElementById('editFeatured').value = w.featured ? '1' : '0';
+    editAwards = [...(w.awards||[])];
+    renderEditAwards();
+    document.getElementById('editModal').classList.add('open');
+  };
+
+  window.closeEdit = function() {
+    document.getElementById('editModal').classList.remove('open');
+    document.getElementById('editAwardInput').value='';
+  };
+
+  window.editAddAwardTag = function() {
+    const input = document.getElementById('editAwardInput');
+    const val = input.value.trim();
+    if(!val) return;
+    editAwards.push(val);
+    input.value='';
+    renderEditAwards();
+  };
+
+  function renderEditAwards() {
+    const list = document.getElementById('editAwardsList');
+    list.innerHTML = editAwards.map((a,i) => `
+      <div class="award-tag" style="justify-content:space-between;">
+        <span>★ ${a}</span>
+        <button onclick="removeEditAward(${i})" title="Remover">✕</button>
+      </div>`).join('');
+  }
+
+  window.removeEditAward = function(i) {
+    editAwards.splice(i,1);
+    renderEditAwards();
+  };
+
+  window.saveEdit = async function() {
+    const id = document.getElementById('editId').value;
+    const title = document.getElementById('editTitle').value.trim();
+    const category = document.getElementById('editCategory').value.trim();
+    const featured = document.getElementById('editFeatured').value === '1';
+
+    if(!title || !category) { toast('Preencha título e categoria','error'); return; }
+
+    const btn = document.getElementById('btnSaveEdit');
+    btn.disabled = true;
+    showSaving(true);
+
+    try {
+      await updateDoc(doc(db,'works',id), { title, category, featured, awards: editAwards });
+      toast('Work atualizado!');
+      closeEdit();
+      await loadWorks();
+    } catch(e) {
+      toast('Erro: '+e.message,'error');
+    } finally {
+      btn.disabled = false;
+      showSaving(false);
+    }
+  };
+
+  // Close modal clicking outside
+  document.getElementById('editModal').addEventListener('click', function(e) {
+    if(e.target===this) closeEdit();
+  });
+
+  // ── Remove ─────────────────────────────────────
+  window.removeWork = async function(id) {
+    if(!confirm('Remover este work do portfolio?')) return;
+    showSaving(true);
+    try {
+      await deleteDoc(doc(db,'works',id));
+      toast('Work removido.');
+      await loadWorks();
+    } catch(e) {
+      toast('Erro: '+e.message,'error');
+    } finally { showSaving(false); }
+  };
+
+  // ── Reorder ────────────────────────────────────
+  window.moveUp = async function(id) {
+    const idx = works.findIndex(w=>w.id===id);
+    if(idx===0) return;
+    await swapWorks(idx-1, idx);
+  };
+
+  window.moveDown = async function(id) {
+    const idx = works.findIndex(w=>w.id===id);
+    if(idx===works.length-1) return;
+    await swapWorks(idx, idx+1);
+  };
+
+  async function swapWorks(a, b) {
+    showSaving(true);
+    try {
+      const batch = writeBatch(db);
+      batch.update(doc(db,'works',works[a].id), {order: works[b].order});
+      batch.update(doc(db,'works',works[b].id), {order: works[a].order});
+      await batch.commit();
+      await loadWorks();
+    } catch(e) {
+      toast('Erro: '+e.message,'error');
+    } finally { showSaving(false); }
+  }
+
+  // ── Preview ────────────────────────────────────
+  let previewTimer;
+  window.livePreview = function() {
+    clearTimeout(previewTimer);
+    previewTimer = setTimeout(() => {
+      const id = document.getElementById('addVimeoId').value.trim();
+      const box = document.getElementById('previewBox');
+      if(id && /^\d+$/.test(id)) {
+        box.innerHTML = `<iframe src="https://player.vimeo.com/video/${id}?background=1&muted=1" allow="autoplay" allowfullscreen></iframe>`;
+      } else {
+        box.innerHTML = 'Video Preview';
+      }
+    }, 800);
+  };
+
+  // ── Utils ──────────────────────────────────────
+  function toast(msg, type='success') {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.style.background = type==='error' ? 'var(--red)' : 'var(--green)';
+    el.style.color = '#fff';
+    el.classList.add('show');
+    setTimeout(()=>el.classList.remove('show'), 3500);
+  }
+
+  function showSaving(v) {
+    document.getElementById('savingOverlay').classList.toggle('show', v);
+  }
+</script>
+</body>
+</html>

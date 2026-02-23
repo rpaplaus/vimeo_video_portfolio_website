@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alma 11:11 Audio</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Barlow+Condensed:wght@200;300;400;600&family=Barlow:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root { --gold:#C9A84C; --gold-light:#E8C96A; --white:#F0EDE8; --gray:#888880; --dark:#0A0A0A; --darker:#050505; }
+  *{margin:0;padding:0;box-sizing:border-box;} html{scroll-behavior:smooth;}
+  body{background:var(--darker);color:var(--white);font-family:'Barlow',sans-serif;font-weight:300;overflow-x:hidden;}
+  /* Logo flutuante sobre o carrossel */
+  .hero-logo{position:absolute;top:32px;left:48px;z-index:50;pointer-events:none;}
+  .hero-logo img{height:170px;}
+
+  /* Navegação lateral estilo agenda */
+  .side-nav{
+    position:fixed;
+    right:28px;
+    top:50%;
+    transform:translateY(-50%);
+    z-index:100;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:0;
+  }
+
+  /* Linha vertical de fundo */
+  .side-nav-track{
+    position:absolute;
+    top:0; bottom:0;
+    left:50%;
+    transform:translateX(-50%);
+    width:1px;
+    background:rgba(201,168,76,.15);
+  }
+
+  /* Marcador de progresso animado */
+  .side-nav-progress{
+    position:absolute;
+    top:0; left:50%;
+    transform:translateX(-50%);
+    width:1px;
+    background:var(--gold);
+    transition:height .3s ease;
+    height:0%;
+  }
+
+  .side-nav-item{
+    position:relative;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:16px 0;
+    cursor:none;
+    text-decoration:none;
+  }
+
+  /* Label que aparece no hover */
+  .side-nav-label{
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:9px;
+    letter-spacing:.35em;
+    text-transform:uppercase;
+    color:var(--gold);
+    opacity:0;
+    transform:translateX(8px);
+    transition:all .3s ease;
+    white-space:nowrap;
+    order:-1; /* label fica à esquerda do dot */
+  }
+
+  .side-nav-item:hover .side-nav-label,
+  .side-nav-item.active .side-nav-label{
+    opacity:1;
+    transform:translateX(0);
+  }
+
+  /* Dot — o marcador circular */
+  .side-nav-dot{
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    border:1px solid rgba(201,168,76,.5);
+    background:transparent;
+    transition:all .3s ease;
+    position:relative;
+    z-index:1;
+    flex-shrink:0;
+  }
+
+  .side-nav-item:hover .side-nav-dot,
+  .side-nav-item.active .side-nav-dot{
+    background:var(--gold);
+    border-color:var(--gold);
+    box-shadow:0 0 8px rgba(201,168,76,.4);
+    transform:scale(1.4);
+  }
+
+  @media(max-width:600px){
+    .side-nav{display:none;}
+    .hero-logo img{height:70px;}
+    .hero-logo{left:24px;top:20px;}
+  }
+  .hero{position:relative;height:100vh;overflow:hidden;}
+  .hero-loader{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--darker);z-index:10;transition:opacity .8s;}
+  .hero-loader.hidden{opacity:0;pointer-events:none;}
+  .spinner{width:36px;height:36px;border:1px solid rgba(201,168,76,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .carousel{position:relative;width:100%;height:100%;}
+  .carousel-slide{position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease;}
+  .carousel-slide.active{opacity:1;}
+  .carousel-slide iframe{width:100%;height:100%;border:none;pointer-events:none;}
+  .slide-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(5,5,5,.3) 0%,rgba(5,5,5,.1) 40%,rgba(5,5,5,.7) 80%,rgba(5,5,5,1) 100%);}
+  .slide-info{position:absolute;bottom:80px;left:64px;right:64px;}
+  .slide-category{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+  .slide-title{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,5vw,64px);font-weight:300;line-height:1.1;letter-spacing:.02em;max-width:700px;}
+  .carousel-controls{position:absolute;bottom:80px;right:64px;display:flex;gap:12px;}
+  .carousel-btn{background:none;border:1px solid rgba(201,168,76,.4);color:var(--gold);width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:none;transition:all .3s;font-size:16px;}
+  .carousel-btn:hover{background:var(--gold);color:var(--darker);}
+  .carousel-dots{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;gap:10px;}
+  .dot{width:24px;height:2px;background:rgba(201,168,76,.3);cursor:none;transition:background .3s,width .3s;}
+  .dot.active{background:var(--gold);width:48px;}
+  .about{padding:120px 64px;max-width:1200px;margin:0 auto;position:relative;}
+  .about::before{content:'11:11';position:absolute;top:80px;right:64px;font-family:'Cormorant Garamond',serif;font-size:120px;font-weight:300;color:rgba(201,168,76,.06);letter-spacing:.1em;user-select:none;}
+  .section-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.5em;text-transform:uppercase;color:var(--gold);margin-bottom:40px;display:flex;align-items:center;gap:16px;}
+  .section-label::after{content:'';display:block;height:1px;width:60px;background:var(--gold);opacity:.4;}
+  .about-headline{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4vw,52px);font-weight:300;line-height:1.3;letter-spacing:.05em;margin-bottom:48px;max-width:800px;}
+  .about-headline em{font-style:italic;color:var(--gold);}
+  .about-awards{display:flex;gap:48px;flex-wrap:wrap;margin-top:60px;padding-top:60px;border-top:1px solid rgba(255,255,255,.06);}
+  .award-item{display:flex;flex-direction:column;gap:4px;}
+  .award-number{font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:300;color:var(--gold);line-height:1;}
+  .award-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);max-width:120px;line-height:1.4;}
+  .works-section{padding:80px 48px;background:var(--dark);}
+  .works-header{max-width:1400px;margin:0 auto 60px;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:20px;}
+  .works-grid{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:2px;}
+
+  /* Card: thumbnail por padrão, vídeo só no hover */
+  .work-card{position:relative;aspect-ratio:16/9;overflow:hidden;cursor:none;background:#111;}
+  .work-thumb{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:opacity .4s ease;z-index:1;}
+  .work-card:hover .work-thumb{opacity:0;}
+  .work-card iframe{position:absolute;inset:0;width:100%;height:100%;border:none;pointer-events:none;opacity:0;transition:opacity .5s ease;z-index:0;}
+  .work-card.video-ready iframe{opacity:1;}
+  .work-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(5,5,5,.95) 0%,rgba(5,5,5,.3) 50%,rgba(5,5,5,.1) 100%);opacity:0;transition:opacity .4s;z-index:2;}
+  .work-card:hover .work-card-overlay{opacity:1;}
+  .work-card-info{position:absolute;bottom:0;left:0;right:0;padding:24px 20px 20px;transform:translateY(10px);opacity:0;transition:all .4s;z-index:3;}
+  .work-card:hover .work-card-info{transform:translateY(0);opacity:1;}
+  .work-category-tag{display:inline-block;font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(201,168,76,.4);padding:3px 10px;margin-bottom:10px;}
+  .work-title{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:300;letter-spacing:.05em;line-height:1.3;color:var(--white);margin-bottom:10px;}
+
+  /* Award tags — mesmo estilo da categoria */
+  .work-awards{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+  .work-award-star{
+    display:inline-block;
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:9px;
+    letter-spacing:.3em;
+    text-transform:uppercase;
+    color:var(--gold);
+    border:1px solid rgba(201,168,76,.4);
+    padding:3px 10px;
+  }
+
+  .work-award-star:hover .star-tooltip{opacity:1;}
+  .work-play-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);width:56px;height:56px;border:1px solid rgba(201,168,76,.6);border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transition:all .4s;color:var(--gold);z-index:3;}
+  .work-card:hover .work-play-btn{opacity:1;transform:translate(-50%,-50%) scale(1);}
+
+  /* Load More */
+  .load-more-wrap{max-width:1400px;margin:48px auto 0;text-align:center;}
+  .btn-load-more{background:none;border:1px solid rgba(201,168,76,.4);color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.4em;text-transform:uppercase;padding:14px 48px;cursor:none;transition:all .3s;display:none;}
+  .btn-load-more:hover{background:var(--gold);color:var(--darker);}
+  .works-counter{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);margin-top:16px;}
+
+  /* Mobile: sem hover, sempre mostra thumb */
+  @media(hover:none){.work-card iframe{display:none;}}
+  .filter-tabs{display:flex;gap:4px;flex-wrap:wrap;}
+  .filter-tab{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--gray);padding:6px 16px;border:1px solid rgba(255,255,255,.08);background:none;cursor:none;transition:all .3s;}
+  .filter-tab.active,.filter-tab:hover{border-color:var(--gold);color:var(--gold);}
+  .lightbox{position:fixed;inset:0;background:rgba(5,5,5,.97);z-index:200;display:none;align-items:center;justify-content:center;}
+  .lightbox.open{display:flex;}
+  .lightbox-inner{width:85vw;max-width:1100px;aspect-ratio:16/9;position:relative;}
+  .lightbox-inner iframe{width:100%;height:100%;border:none;}
+  .lightbox-close{position:absolute;top:-48px;right:0;background:none;border:none;color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;cursor:none;display:flex;gap:8px;align-items:center;}
+  footer{background:var(--darker);padding:80px 64px 48px;border-top:1px solid rgba(201,168,76,.1);}
+  .footer-main{display:grid;grid-template-columns:1fr 1.5fr 1fr;gap:80px;max-width:1400px;margin:0 auto 80px;}
+  .footer-col-title{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.4em;text-transform:uppercase;color:var(--gold);margin-bottom:24px;}
+  .footer-logo{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;letter-spacing:.3em;margin-bottom:24px;line-height:1.2;}
+  .footer-logo span{color:var(--gold);}
+  .footer-tagline{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--gray);line-height:1.7;margin-bottom:36px;}
+  .social-links { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  .social-link { color: var(--gray); transition: color .3s; }
+  .social-link:hover { color: var(--gold); }
+  .footer-center p{font-size:13px;line-height:1.9;color:var(--gray);}
+  .footer-center p strong{color:var(--white);font-weight:400;}
+  .footer-partners-placeholder{width:100%;height:200px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.2em;color:var(--gray);text-transform:uppercase;}
+  .footer-partners-name{font-family:'Cormorant Garamond',serif;font-size:15px;letter-spacing:.1em;color:var(--white);margin-bottom:4px;}
+  .footer-partners-role{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--gray);}
+  .footer-bottom{max-width:1400px;margin:0 auto;padding-top:32px;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;}
+  .footer-bottom p{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.2em;color:rgba(136,136,128,.5);text-transform:uppercase;}
+  .footer-bottom a{color:rgba(201,168,76,.5);text-decoration:none;transition:color .3s;}
+  .footer-bottom a:hover{color:var(--gold);}
+  .fade-in{opacity:0;transform:translateY(24px);transition:opacity .8s ease,transform .8s ease;}
+  .fade-in.visible{opacity:1;transform:translateY(0);}
+  .grid-msg{grid-column:1/-1;text-align:center;padding:80px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.3em;color:var(--gray);text-transform:uppercase;}
+  @media(max-width:900px){.about{padding:80px 24px;}.about::before{display:none;}.works-section{padding:60px 16px;}.footer-main{grid-template-columns:1fr;gap:48px;}footer{padding:60px 24px 40px;}.slide-info{left:24px;right:24px;bottom:60px;}.carousel-controls{right:24px;bottom:60px;}}
+  @media(max-width:600px){.about-awards{gap:28px;}.award-number{font-size:36px;}.works-grid{grid-template-columns:1fr;}}
+
+  /* ── Contact Modal ─────────────────────────────── */
+  .contact-modal-bg{position:fixed;inset:0;background:rgba(5,5,5,.92);z-index:300;display:none;align-items:center;justify-content:center;padding:24px;}
+  .contact-modal-bg.open{display:flex;}
+  .contact-modal{background:#0f0f0f;border:1px solid rgba(201,168,76,.15);padding:56px 48px;width:100%;max-width:520px;position:relative;animation:contactUp .4s ease both;}
+  @keyframes contactUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+  .contact-modal-close{position:absolute;top:20px;right:24px;background:none;border:none;color:var(--gray);cursor:pointer;font-size:20px;line-height:1;transition:color .2s;}
+  .contact-modal-close:hover{color:var(--gold);}
+  .contact-modal h2{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;letter-spacing:.05em;margin-bottom:4px;}
+  .contact-modal-sub{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--gray);margin-bottom:40px;}
+  .contact-field{margin-bottom:20px;}
+  .contact-label{display:block;font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.4em;text-transform:uppercase;color:var(--gray);margin-bottom:8px;}
+  .contact-input{width:100%;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:var(--white);font-family:'Barlow',sans-serif;font-size:14px;padding:12px 16px;outline:none;transition:border-color .3s;resize:none;appearance:none;}
+  .contact-input:focus{border-color:rgba(201,168,76,.4);}
+  .contact-input::placeholder{color:rgba(136,136,128,.35);}
+  .btn-contact-send{width:100%;padding:15px;background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.4em;text-transform:uppercase;cursor:pointer;margin-top:8px;transition:all .35s;position:relative;overflow:hidden;}
+  .btn-contact-send::before{content:'';position:absolute;inset:0;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .4s ease;}
+  .btn-contact-send:hover::before{transform:scaleX(1);}
+  .btn-contact-send-label{position:relative;z-index:1;transition:color .35s;}
+  .btn-contact-send:hover .btn-contact-send-label{color:var(--darker);}
+  .btn-contact-send:disabled{opacity:.5;cursor:not-allowed;}
+  .contact-success{text-align:center;padding:48px 0;display:none;}
+  .contact-success .check{font-size:40px;margin-bottom:20px;}
+  .contact-success p{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;color:var(--white);margin-bottom:8px;}
+  .contact-success small{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--gray);}
+  @media(max-width:600px){.contact-modal{padding:40px 24px;}}
+</style>
+</head>
+<body>
+
+
+
+<!-- Navegação lateral estilo agenda -->
+<nav class="side-nav" id="sideNav">
+  <div class="side-nav-track"></div>
+  <div class="side-nav-progress" id="sideProgress"></div>
+  <a class="side-nav-item" href="#hero" data-section="hero">
+    <span class="side-nav-label">Home</span>
+    <span class="side-nav-dot"></span>
+  </a>
+  <a class="side-nav-item" href="#about" data-section="about">
+    <span class="side-nav-label">About</span>
+    <span class="side-nav-dot"></span>
+  </a>
+  <a class="side-nav-item" href="#works" data-section="works">
+    <span class="side-nav-label">Works</span>
+    <span class="side-nav-dot"></span>
+  </a>
+  <a class="side-nav-item" href="#contact" data-section="contact">
+    <span class="side-nav-label">Contact</span>
+    <span class="side-nav-dot"></span>
+  </a>
+</nav>
+
+<section class="hero" id="hero">
+  <!-- Logo flutuante dentro do hero -->
+  <div class="hero-logo">
+    <img src="images/logo.png" alt="Alma 11:11">
+  </div>
+  <div class="hero-loader" id="heroLoader"><div class="spinner"></div></div>
+  <div class="carousel" id="carousel"></div>
+  <div class="carousel-dots" id="dots"></div>
+  <div class="carousel-controls">
+    <button class="carousel-btn" onclick="prevSlide()">&#8592;</button>
+    <button class="carousel-btn" onclick="nextSlide()">&#8594;</button>
+  </div>
+</section>
+
+<section class="about" id="about">
+  <div class="section-label fade-in">About Us</div>
+  <h2 class="about-headline fade-in">We Are <em>Alma 11:11</em><br>We Make Music<br>For Ads — For Movies — For Life</h2>
+  <div class="about-awards fade-in">
+    <div class="award-item"><span class="award-number">11</span><span class="award-label">Cannes Lions</span></div>
+    <div class="award-item"><span class="award-number">7</span><span class="award-label">Clios incl. Radio & Audio</span></div>
+    <div class="award-item"><span class="award-number">10</span><span class="award-label">El Ojo incl. Best Use of Original Music</span></div>
+    <div class="award-item"><span class="award-number">65+</span><span class="award-label">International Awards</span></div>
+  </div>
+</section>
+
+<section class="works-section" id="works">
+  <div class="works-header">
+    <div class="section-label" style="margin:0">All Works</div>
+    <div class="filter-tabs" id="filterTabs"></div>
+  </div>
+  <div class="works-grid" id="worksGrid">
+    <div class="grid-msg" id="gridLoader">Loading works...</div>
+  </div>
+  <div class="load-more-wrap">
+    <button class="btn-load-more" id="btnLoadMore" onclick="window.loadMore()">Load More</button>
+    <div class="works-counter" id="worksCounter"></div>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="footer-main">
+    <div>
+      <img src="images/logo.png" alt="logo" style="width:70%;margin-bottom:16px;">
+      <p class="footer-tagline">We Are An Audio Hub For Advertising And Content With A Creative And Provocative Style.</p>
+      <div class="social-links">
+        <a class="social-link" href="https://www.facebook.com/alma1111audio" target="_blank" title="Facebook">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        </a>
+        <a class="social-link" href="https://twitter.com/alma1111audio" target="_blank" title="X / Twitter">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
+        <a class="social-link" href="https://www.linkedin.com/company/alma-11-11-audio/" target="_blank" title="LinkedIn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+        </a>
+        <a class="social-link" href="http://instagram.com/alma1111audio" target="_blank" title="Instagram">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a class="social-link" href="https://www.youtube.com/1111Adsyou" target="_blank" title="YouTube">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58a2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#0A0A0A"/></svg>
+        </a>
+        <a class="social-link" href="http://vimeo.com/alma1111audio" target="_blank" title="Vimeo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M22 7.42c-.09 2.04-1.52 4.83-4.28 8.37C14.88 19.38 12.56 21 10.67 21c-1.15 0-2.12-1.06-2.92-3.18L6.3 12.6C5.76 10.48 5.18 9.42 4.56 9.42c-.14 0-.62.29-1.44.86L2 9.07c.9-.79 1.8-1.58 2.67-2.38 1.21-1.04 2.11-1.59 2.72-1.64 1.43-.14 2.31.84 2.64 2.93.36 2.25.6 3.65.75 4.2.41 1.88.87 2.82 1.37 2.82.39 0 .97-.61 1.75-1.84.78-1.23 1.19-2.16 1.24-2.81.11-.06.19-.53.04-1.42-.21-.88-.82-1.31-1.58-1.07-.56.17-1.03.62-1.03 1.22 0 .35.12.71.35 1.06-.94-.31-1.41-1.17-1.41-2.59 0-1.13.35-2.08 1.06-2.84.71-.76 1.57-1.12 2.59-1.09 1.55.05 2.63 1.12 3.26 3.21z"/></svg>
+        </a>
+        <a class="social-link" href="#" onclick="openContact();return false;" title="E-mail">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-center">
+      <div class="footer-col-title">Our Story</div>
+      <p>Alma 11:11 Audio has done music production, creative consultancy, licensing, sync and more for many Brands like <strong>Citroën, Mitsubishi, Honda, Coca-Cola, Samsung, Renault, Gatorade, Jeep, Google, Avon, Unilever, Ambev</strong> and creative agencies such as <strong>BBH, Publicis, DDB, DPZT, Leo Burnett, Havas, VMLY&R, Wunderman Thompson</strong> and many more.<br><br>We have producers in Brazil, USA, London and Spain that goes from São Paulo's Live PA, New York's EDM to the L.A. movie scores. Trust our services and we will be ready to make music that is going to make your production last forever.<br><br><em style="font-family:'Cormorant Garamond',serif;font-size:15px;letter-spacing:.1em;color:var(--gold);">Listen to Your Soul 11:11</em></p>
+    </div>
+    <div>
+      <div class="footer-col-title">The Team</div>
+      <img src="images/pic.png" alt="Founders & Partners" style="width:100%;margin-bottom:16px;">
+      <div class="award-label">Diego Raso</div>
+      <div class="award-label">Carla Bräuninger</div>
+      <div class="footer-col-title">Founders & Partners</div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div style="display:flex; gap:24px; align-items:center;">
+      <p>© 2026 Alma 11:11 Audio. All rights reserved.</p>
+      <a href="https://paplauskas.com.br" target="_blank" style="font-family:'Barlow Condensed',sans-serif; font-size:10px; letter-spacing:.2em; color:rgba(136,136,128,.5); text-transform:uppercase; text-decoration:none; transition:color .3s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='rgba(136,136,128,.5)'">WebDev — RPaplaus</a>
+    </div>
+    <a href="login.html">Partner Area</a>
+  </div>
+</footer>
+
+<!-- Contact Modal -->
+<div class="contact-modal-bg" id="contactModal">
+  <div class="contact-modal">
+    <button class="contact-modal-close" onclick="closeContact()">✕</button>
+
+    <div id="contactForm">
+      <h2>Get in Touch</h2>
+      <p class="contact-modal-sub"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="751401101b111c18101b011a3514191814444444441400111c1a5b161a185b1707">[email&#160;protected]</a></p>
+
+      <div class="contact-field">
+        <label class="contact-label">Name</label>
+        <input class="contact-input" type="text" id="cName" placeholder="Your name">
+      </div>
+      <div class="contact-field">
+        <label class="contact-label">E-mail</label>
+        <input class="contact-input" type="email" id="cEmail" placeholder="your@email.com">
+      </div>
+      <div class="contact-field">
+        <label class="contact-label">Message</label>
+        <textarea class="contact-input" id="cMessage" rows="5" placeholder="Tell us about your project..."></textarea>
+      </div>
+      <button class="btn-contact-send" id="btnContactSend" onclick="sendContact()">
+        <span class="btn-contact-send-label">Send Message</span>
+      </button>
+    </div>
+
+    <div class="contact-success" id="contactSuccess">
+      <div class="check">✦</div>
+      <p>Message sent!</p>
+      <small>We'll get back to you soon</small>
+    </div>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-inner">
+    <button class="lightbox-close" onclick="closeLightbox()">✕ &nbsp;Close</button>
+    <iframe id="lightboxFrame" src="" allow="autoplay; fullscreen" allowfullscreen></iframe>
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // ▼▼▼ COLE SEU firebaseConfig AQUI ▼▼▼
+  const firebaseConfig = {
+    apiKey: "Asvbnsviusjnvm'imjvniusIU[nouanpaiuvn[os",
+    authDomain: "myfirebase.firebaseapp.com",
+    projectId: "myfirebase",
+    storageBucket: "myfirebase.firebasestorage.app",
+    messagingSenderId: "xxxxxxxxxxxxx",
+    appId: "Xxxxxxxxxxxxxxxxxxxxx",
+    measurementId: "G-KEMDCYBHZD"
+  };
+  // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+
+
+  // ── Side nav scroll tracking ───────────────────
+  const sections = ['hero','about','works','contact'];
+  const navItems = document.querySelectorAll('.side-nav-item');
+  const progressBar = document.getElementById('sideProgress');
+
+  function updateSideNav() {
+    const scrollY = window.scrollY;
+    const docH = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = Math.min(100, (scrollY / docH) * 100);
+    progressBar.style.height = pct + '%';
+
+    let active = 'hero';
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if(!el) return;
+      if(scrollY >= el.offsetTop - window.innerHeight / 2) active = id;
+    });
+
+    navItems.forEach(item => {
+      item.classList.toggle('active', item.dataset.section === active);
+    });
+  }
+
+  window.addEventListener('scroll', updateSideNav, {passive:true});
+  updateSideNav();
+
+  // Scroll reveal
+  const observer = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }), {threshold:.1});
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+  let allWorks = [], currentSlide = 0, autoTimer;
+
+  // ── Load from Firestore ────────────────────────
+  async function loadWorks() {
+    try {
+      const snap = await getDocs(query(collection(db,'works'), orderBy('order','asc')));
+      allWorks = snap.docs.map(d => ({firestoreId: d.id, ...d.data()}));
+    } catch(e) {
+      console.error(e);
+      document.getElementById('gridLoader').textContent = 'Erro ao carregar works. Verifique o firebaseConfig.';
+    }
+    document.getElementById('heroLoader').classList.add('hidden');
+    buildCarousel();
+    buildGrid('all');
+  }
+
+  // ── Carousel ───────────────────────────────────
+  function buildCarousel() {
+    const featured = allWorks.filter(w => w.featured).slice(0,5);
+    const slides = featured.length ? featured : allWorks.slice(0,5);
+    const carEl = document.getElementById('carousel'), dotsEl = document.getElementById('dots');
+    carEl.innerHTML = ''; dotsEl.innerHTML = '';
+    if(!slides.length) return;
+
+    slides.forEach((w,i) => {
+      const s = document.createElement('div');
+      s.className = 'carousel-slide'+(i===0?' active':'');
+      s.innerHTML = `<iframe src="https://player.vimeo.com/video/${w.vimeoId}?background=1&autoplay=1&loop=1&muted=1" allow="autoplay;fullscreen" allowfullscreen></iframe><div class="slide-overlay"></div><div class="slide-info"><div class="slide-category">${w.category||''}</div><h1 class="slide-title">${w.title}</h1></div>`;
+      s.addEventListener('click', () => openLightbox(w.vimeoId));
+      carEl.appendChild(s);
+      const dot = document.createElement('div');
+      dot.className = 'dot'+(i===0?' active':'');
+      dot.addEventListener('click', () => goTo(i));
+      dotsEl.appendChild(dot);
+    });
+    clearInterval(autoTimer);
+    autoTimer = setInterval(() => window.nextSlide(), 10000);
+  }
+
+  function goTo(n) {
+    const slides = document.querySelectorAll('.carousel-slide'), dots = document.querySelectorAll('.dot');
+    if(!slides.length) return;
+    slides[currentSlide].classList.remove('active'); dots[currentSlide].classList.remove('active');
+    currentSlide = (n+slides.length)%slides.length;
+    slides[currentSlide].classList.add('active'); dots[currentSlide].classList.add('active');
+  }
+  window.nextSlide = () => goTo(currentSlide+1);
+  window.prevSlide = () => goTo(currentSlide-1);
+
+  // ── Works Grid ─────────────────────────────────
+  const PAGE_SIZE = 6;
+  let currentFilter = 'all';
+  let currentPage = 0;
+  let filteredList = [];
+  const isTouchDevice = () => window.matchMedia('(hover:none)').matches;
+
+  function buildGrid(filter) {
+    const grid = document.getElementById('worksGrid'), tabs = document.getElementById('filterTabs');
+    const loader = document.getElementById('gridLoader');
+    if(loader) loader.remove();
+    grid.innerHTML = '';
+    currentFilter = filter;
+    currentPage = 0;
+
+    // Categorias normalizadas para evitar duplicatas
+    const cats = ['all',...new Set(allWorks.map(w=>(w.category||'').toUpperCase().trim()).filter(Boolean))];
+    tabs.innerHTML = cats.map(c =>
+      `<button class="filter-tab ${c===filter?'active':''}" onclick="window.filterWorks('${c}')">${c}</button>`
+    ).join('');
+
+    filteredList = filter==='all'
+      ? allWorks
+      : allWorks.filter(w=>(w.category||'').toUpperCase().trim()===filter);
+
+    if(!filteredList.length){ grid.innerHTML='<div class="grid-msg">No works found.</div>'; updateLoadMore(); return; }
+    appendPage();
+  }
+
+  function appendPage() {
+    const grid = document.getElementById('worksGrid');
+    const slice = filteredList.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
+
+    slice.forEach((w, i) => {
+      const card = document.createElement('div');
+      card.className = 'work-card fade-in';
+      card.style.transitionDelay = `${(i%6)*.07}s`;
+
+      card.innerHTML = `
+        <img class="work-thumb" src="https://vumbnail.com/${w.vimeoId}_medium.jpg" alt="${w.title}" loading="lazy"
+             onerror="this.src='https://vumbnail.com/${w.vimeoId}.jpg'">
+        <div class="work-card-overlay"></div>
+        <div class="work-play-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        <div class="work-card-info">
+          <div class="work-category-tag">${w.category||''}</div>
+          <div class="work-title">${w.title}</div>
+          ${(w.awards||[]).length ? `
+          <div class="work-awards">
+            ${(w.awards).map(a=>`<span class="work-award-star">★ ${a}</span>`).join('')}
+          </div>` : ''}
+        </div>`;
+
+      // Desktop: carrega vídeo só quando hover por 300ms
+      if(!isTouchDevice()) {
+        let hoverTimer;
+        card.addEventListener('mouseenter', () => {
+          hoverTimer = setTimeout(() => {
+            if(!card.querySelector('iframe')) {
+              const iframe = document.createElement('iframe');
+              iframe.src = `https://player.vimeo.com/video/${w.vimeoId}?background=1&autoplay=1&loop=1&muted=1&quality=360p`;
+              iframe.allow = 'autoplay;fullscreen';
+              iframe.allowFullscreen = true;
+              card.insertBefore(iframe, card.firstChild);
+              iframe.onload = () => card.classList.add('video-ready');
+            }
+          }, 300);
+        });
+        card.addEventListener('mouseleave', () => {
+          clearTimeout(hoverTimer);
+          const iframe = card.querySelector('iframe');
+          if(iframe){ iframe.remove(); card.classList.remove('video-ready'); }
+        });
+      }
+
+      card.addEventListener('click', () => openLightbox(w.vimeoId));
+      grid.appendChild(card);
+      observer.observe(card);
+    });
+
+    currentPage++;
+    updateLoadMore();
+  }
+
+  function updateLoadMore() {
+    const btn = document.getElementById('btnLoadMore');
+    const counter = document.getElementById('worksCounter');
+    const shown = Math.min(currentPage * PAGE_SIZE, filteredList.length);
+    const total = filteredList.length;
+    if(total > 0) counter.textContent = `Showing ${shown} of ${total} works`;
+    btn.style.display = shown < total ? 'inline-block' : 'none';
+  }
+
+  window.loadMore = () => appendPage();
+  window.filterWorks = cat => buildGrid(cat);
+
+  // ── Lightbox ───────────────────────────────────
+  window.openLightbox = id => {
+    document.getElementById('lightboxFrame').src = `https://player.vimeo.com/video/${id}?autoplay=1`;
+    document.getElementById('lightbox').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+  window.closeLightbox = () => {
+    document.getElementById('lightboxFrame').src = '';
+    document.getElementById('lightbox').classList.remove('open');
+    document.body.style.overflow = '';
+  };
+  document.getElementById('lightbox').addEventListener('click', e => {
+    if(e.target===e.currentTarget) window.closeLightbox();
+  });
+
+  // ── Contact Modal ──────────────────────────────
+  window.openContact = () => {
+    document.getElementById('contactModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.closeContact = () => {
+    document.getElementById('contactModal').classList.remove('open');
+    document.body.style.overflow = '';
+    setTimeout(() => {
+      document.getElementById('contactForm').style.display = 'block';
+      document.getElementById('contactSuccess').style.display = 'none';
+      document.getElementById('cName').value = '';
+      document.getElementById('cEmail').value = '';
+      document.getElementById('cMessage').value = '';
+      document.getElementById('btnContactSend').disabled = false;
+      document.querySelector('.btn-contact-send-label').textContent = 'Send Message';
+    }, 400);
+  };
+
+  document.getElementById('contactModal').addEventListener('click', e => {
+    if(e.target===e.currentTarget) window.closeContact();
+  });
+
+  window.sendContact = async () => {
+    const name    = document.getElementById('cName').value.trim();
+    const email   = document.getElementById('cEmail').value.trim();
+    const message = document.getElementById('cMessage').value.trim();
+    const btn     = document.getElementById('btnContactSend');
+    const label   = document.querySelector('.btn-contact-send-label');
+
+    if(!name || !email || !message) {
+      label.textContent = 'Fill in all fields';
+      setTimeout(() => label.textContent = 'Send Message', 2000);
+      return;
+    }
+
+    btn.disabled = true;
+    label.textContent = 'Sending...';
+
+
+    // Substitua o endpoint ──────────────────────────────
+
+    try {
+      const res = await fetch('https://formspree.io/f/SEU_ID_AQUI', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ name, email, message })
+      });
+
+      if(res.ok) {
+        document.getElementById('contactForm').style.display = 'none';
+        document.getElementById('contactSuccess').style.display = 'block';
+      } else {
+        throw new Error('Server error');
+      }
+    } catch(e) {
+      btn.disabled = false;
+      label.textContent = 'Error — try again';
+      setTimeout(() => label.textContent = 'Send Message', 3000);
+    }
+  };
+
+  loadWorks();
+</script>
+</body>
+</html>

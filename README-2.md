@@ -2,7 +2,7 @@
 
 Site institucional e portfólio para a **Alma 11:11 Audio**, empresa de produção musical para publicidade e conteúdo com prêmios em Cannes Lions, Clios, El Ojo e mais de 65 prêmios internacionais.
 
-![Preview](images/logo.png)
+![Preview](public.html/images/logo.png)
 
 ---
 
